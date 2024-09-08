@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const taxForm = document.getElementById('tax-form');
-    const dashboardContainer = document.createElement('div');
-    document.querySelector('.container').appendChild(dashboardContainer);
+    const modal = document.getElementById('map-modal');
+    const modalContent = document.getElementById('modal-content');
+    const closeModal = document.getElementById('close-modal');
 
     taxForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -27,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
-            displayDashboard(data, income);
+            displayMap(data, income);
         } catch (error) {
             showError(error.message);
         }
@@ -41,23 +42,40 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => errorElement.remove(), 3000);
     }
 
-    function displayDashboard(data, monthlyIncome) {
-        dashboardContainer.innerHTML = '';
-        fetch('/templates/dashboard.html')
-            .then(response => response.text())
-            .then(html => {
-                dashboardContainer.innerHTML = html;
-                updateDashboardData(data, monthlyIncome);
-                createChart(data);
-            });
+    function displayMap(data, monthlyIncome) {
+        modalContent.innerHTML = '';
+        const mapContent = createMapContent(data, monthlyIncome);
+        modalContent.innerHTML = mapContent;
+        modal.classList.remove('hidden');
+        createChart(data);
     }
 
-    function updateDashboardData(data, monthlyIncome) {
+    function createMapContent(data, monthlyIncome) {
         const annualIncome = monthlyIncome * 12;
-        document.getElementById('annual-income').textContent = formatCurrency(annualIncome);
-        document.getElementById('total-tax').textContent = formatCurrency(data.total_tax);
-        document.getElementById('net-income').textContent = formatCurrency(data.net_income);
-        document.getElementById('effective-tax-rate').textContent = ((data.total_tax / annualIncome) * 100).toFixed(2) + '%';
+        return `
+            <h2 class="text-2xl font-bold mb-4">Tax Distribution Map</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-2">Annual Income</h3>
+                    <p class="text-2xl font-bold">${formatCurrency(annualIncome)}</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-2">Total Tax</h3>
+                    <p class="text-2xl font-bold">${formatCurrency(data.total_tax)}</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-2">Net Income</h3>
+                    <p class="text-2xl font-bold">${formatCurrency(data.net_income)}</p>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-2">Effective Tax Rate</h3>
+                    <p class="text-2xl font-bold">${((data.total_tax / annualIncome) * 100).toFixed(2)}%</p>
+                </div>
+            </div>
+            <div class="mt-8">
+                <canvas id="tax-distribution-chart"></canvas>
+            </div>
+        `;
     }
 
     function createChart(data) {
@@ -96,4 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatCurrency(amount) {
         return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
     }
+
+    closeModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
 });

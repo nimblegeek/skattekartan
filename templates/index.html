@@ -3,32 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tax Distribution Calculator</title>
+    <title>Tax Map</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold mb-8 text-center">Tax Distribution Calculator</h1>
-        <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
-            <form id="tax-form" class="space-y-4">
-                <div>
-                    <label for="income" class="block text-sm font-medium text-gray-700">Monthly Income</label>
-                    <input type="number" id="income" name="income" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                </div>
-                <div>
-                    <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality</label>
-                    <select id="municipality" name="municipality" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                        <option value="">Select a municipality</option>
-                        {% for municipality in municipalities %}
-                        <option value="{{ municipality }}">{{ municipality }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">Calculate</button>
-            </form>
+<body class="bg-gray-100 flex flex-col min-h-screen">
+    <header class="bg-indigo-600 text-white py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Tax Map</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#" class="hover:text-indigo-200">Home</a></li>
+                    <li><a href="#" class="hover:text-indigo-200">About</a></li>
+                    <li><a href="#" class="hover:text-indigo-200">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-2xl mx-auto text-center mb-8">
+                <h2 class="text-3xl font-bold text-indigo-600 mb-4">Vad får jag för pengarna?</h2>
+                <p class="text-xl text-gray-700">Beräkna vad du betalar varje månad i kommunalskatt och se vart pengarna går.</p>
+            </div>
+            <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-2xl font-semibold text-center mb-6">Beräkna din skatt</h3>
+                <form id="tax-form" class="space-y-4">
+                    <div>
+                        <label for="income" class="block text-sm font-medium text-gray-700">Monthly Income</label>
+                        <input type="number" id="income" name="income" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    </div>
+                    <div>
+                        <label for="municipality" class="block text-sm font-medium text-gray-700">Municipality</label>
+                        <select id="municipality" name="municipality" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <option value="">Select a municipality</option>
+                            {% for municipality in municipalities %}
+                            <option value="{{ municipality }}">{{ municipality }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">Calculate</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-4 mt-8">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <p>&copy; 2024 Tax Map. All rights reserved.</p>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#" class="hover:text-gray-300">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-gray-300">Terms of Service</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div id="map-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-4/5 shadow-lg rounded-md bg-white">
+            <div id="modal-content"></div>
+            <div class="text-right mt-4">
+                <button id="close-modal" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    Close
+                </button>
+            </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
